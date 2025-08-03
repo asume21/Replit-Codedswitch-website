@@ -41,6 +41,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/ai/providers", (req, res) => {
     const providers = [
       {
+        id: "grok",
+        name: "Grok AI",
+        description: "Powerful AI with a sense of humor and creative edge",
+        features: ["Code Translation", "Lyric Generation", "Beat Creation", "Code-to-Music", "AI Assistant"],
+        available: !!(process.env.XAI_API_KEY || process.env.GROK_API_KEY),
+        isDefault: true
+      },
+      {
         id: "openai",
         name: "OpenAI GPT-4o",
         description: "Advanced general-purpose AI with excellent reasoning",
@@ -102,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sourceLanguage: z.string().min(1),
         targetLanguage: z.string().min(1),
         userId: z.string().optional(),
-        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("grok")
       });
 
       const { sourceCode, sourceLanguage, targetLanguage, userId, aiProvider } = schema.parse(req.body);
