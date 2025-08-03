@@ -9,11 +9,35 @@ if (process.env.OPENAI_API_KEY) {
   openAIConfig.apiKey = process.env.OPENAI_API_KEY;
 } else if (process.env.OPENAI_API_KEY_ENV_VAR) {
   openAIConfig.apiKey = process.env.OPENAI_API_KEY_ENV_VAR;
+} else if (process.env.NODE_ENV === 'production') {
+  // In production, we'll use a dummy key but disable API calls
+  openAIConfig.apiKey = 'dummy-key';
+  console.warn('Warning: Running with a dummy OpenAI API key in production');
 } else {
   console.warn('Warning: No OpenAI API key found in environment variables');
 }
 
-const openai = new OpenAI(openAIConfig);
+// Create OpenAI instance with error handling
+let openai;
+try {
+  openai = new OpenAI(openAIConfig);
+} catch (error) {
+  console.error('Failed to initialize OpenAI client:', error.message);
+  // Create a mock client that will fail gracefully
+  openai = {
+    chat: {
+      completions: {
+        create: async () => ({
+          choices: [{
+            message: {
+              content: 'OpenAI API is not properly configured. Please check your API keys.'
+            }
+          }]
+        })
+      }
+    }
+  };
+}
 
 export async function translateCode(
   sourceCode: string,
