@@ -1,5 +1,20 @@
 import OpenAI from "openai";
 
+// Define the minimum required interface for the OpenAI client
+interface OpenAIMinimalClient {
+  chat: {
+    completions: {
+      create: (params: any) => Promise<{
+        choices: Array<{
+          message: {
+            content: string;
+          };
+        }>;
+      }>;
+    };
+  };
+}
+
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 // Initialize OpenAI client with environment variable check
 const openAIConfig: { apiKey?: string } = {};
@@ -18,10 +33,14 @@ if (process.env.OPENAI_API_KEY) {
 }
 
 // Create OpenAI instance with error handling
-let openai;
+let openai: OpenAIMinimalClient;
 try {
-  openai = new OpenAI(openAIConfig);
-} catch (error) {
+  // Create the actual OpenAI client
+  const client = new OpenAI(openAIConfig);
+  
+  // Type assertion to our minimal interface
+  openai = client as unknown as OpenAIMinimalClient;
+} catch (error: any) {
   console.error('Failed to initialize OpenAI client:', error.message);
   // Create a mock client that will fail gracefully
   openai = {
