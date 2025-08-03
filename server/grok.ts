@@ -1,6 +1,20 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({ baseURL: "https://api.x.ai/v1", apiKey: process.env.XAI_API_KEY });
+// Initialize Grok client with environment variable check
+const grokConfig: { baseURL: string; apiKey?: string } = {
+  baseURL: "https://api.x.ai/v1"
+};
+
+// Check for API key in environment variables
+if (process.env.XAI_API_KEY) {
+  grokConfig.apiKey = process.env.XAI_API_KEY;
+} else if (process.env.GROK_API_KEY) {
+  grokConfig.apiKey = process.env.GROK_API_KEY;
+} else {
+  console.warn('Warning: No Grok API key found in environment variables (XAI_API_KEY or GROK_API_KEY)');
+}
+
+const openai = new OpenAI(grokConfig);
 
 export async function translateCodeWithGrok(sourceCode: string, sourceLanguage: string, targetLanguage: string): Promise<string> {
   const prompt = `Translate the following ${sourceLanguage} code to ${targetLanguage}. Only return the translated code without explanations:

@@ -1,9 +1,19 @@
 import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
-});
+// Initialize OpenAI client with environment variable check
+const openAIConfig: { apiKey?: string } = {};
+
+// Check for API key in environment variables
+if (process.env.OPENAI_API_KEY) {
+  openAIConfig.apiKey = process.env.OPENAI_API_KEY;
+} else if (process.env.OPENAI_API_KEY_ENV_VAR) {
+  openAIConfig.apiKey = process.env.OPENAI_API_KEY_ENV_VAR;
+} else {
+  console.warn('Warning: No OpenAI API key found in environment variables');
+}
+
+const openai = new OpenAI(openAIConfig);
 
 export async function translateCode(
   sourceCode: string,
