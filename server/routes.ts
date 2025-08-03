@@ -11,6 +11,20 @@ import {
   getAIAssistance
 } from "./openai";
 import {
+  translateCodeWithGemini,
+  generateLyricsWithGemini,
+  generateBeatWithGemini,
+  convertCodeToMusicWithGemini,
+  getAIAssistanceWithGemini
+} from "./gemini";
+import {
+  translateCodeWithGrok,
+  generateLyricsWithGrok,
+  generateBeatWithGrok,
+  convertCodeToMusicWithGrok,
+  getAIAssistanceWithGrok
+} from "./grok";
+import {
   insertUserSchema,
   insertProjectSchema,
   insertCodeTranslationSchema,
@@ -21,6 +35,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // AI Providers endpoint
+  app.get("/api/ai/providers", (req, res) => {
+    const providers = [
+      {
+        id: "openai",
+        name: "OpenAI GPT-4o",
+        description: "Advanced general-purpose AI with excellent reasoning",
+        features: ["Code Translation", "Lyric Generation", "Beat Creation", "Code-to-Music", "AI Assistant"],
+        available: !!process.env.OPENAI_API_KEY
+      },
+      {
+        id: "gemini",
+        name: "Google Gemini",
+        description: "Multimodal AI with strong creative and analytical capabilities",
+        features: ["Code Translation", "Lyric Generation", "Beat Creation", "Code-to-Music", "AI Assistant"],
+        available: !!process.env.GEMINI_API_KEY
+      },
+      {
+        id: "grok",
+        name: "xAI Grok",
+        description: "Creative AI with wit, humor, and innovative thinking",
+        features: ["Code Translation", "Lyric Generation", "Beat Creation", "Code-to-Music", "AI Assistant"],
+        available: !!process.env.XAI_API_KEY
+      }
+    ];
+    res.json(providers);
   });
 
   // User routes
@@ -59,12 +101,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sourceCode: z.string().min(1),
         sourceLanguage: z.string().min(1),
         targetLanguage: z.string().min(1),
-        userId: z.string().optional()
+        userId: z.string().optional(),
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
       });
 
-      const { sourceCode, sourceLanguage, targetLanguage, userId } = schema.parse(req.body);
+      const { sourceCode, sourceLanguage, targetLanguage, userId, aiProvider } = schema.parse(req.body);
       
-      const result = await translateCode(sourceCode, sourceLanguage, targetLanguage);
+      let result: any;
+      switch (aiProvider) {
+        case "gemini":
+          result = await translateCodeWithGemini(sourceCode, sourceLanguage, targetLanguage);
+          break;
+        case "grok":
+          result = await translateCodeWithGrok(sourceCode, sourceLanguage, targetLanguage);
+          break;
+        default:
+          result = await translateCode(sourceCode, sourceLanguage, targetLanguage);
+      }
+      
+      // Extract translated code - handle different return types
+      const translatedCodeResult = typeof result === 'string' ? result : result.translatedCode;
       
       // Save translation if user is provided
       if (userId) {
@@ -73,11 +129,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sourceLanguage,
           targetLanguage,
           sourceCode,
-          translatedCode: result.translatedCode
+          translatedCode: translatedCodeResult
         });
-        res.json({ ...result, id: translation.id });
+        res.json({ translatedCode: translatedCodeResult, id: translation.id });
       } else {
-        res.json(result);
+        res.json({ translatedCode: translatedCodeResult });
       }
     } catch (error) {
       res.status(500).json({ 
@@ -106,12 +162,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         prompt: z.string().min(1),
         genre: z.string().optional(),
         mood: z.string().optional(),
-        userId: z.string().optional()
+        userId: z.string().optional(),
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
       });
 
-      const { prompt, genre, mood, userId } = schema.parse(req.body);
+      const { prompt, genre, mood, userId, aiProvider } = schema.parse(req.body);
       
-      const result = await generateLyrics(prompt, genre, mood);
+      let result: any;
+      switch (aiProvider) {
+        case "gemini":
+          result = { lyrics: await generateLyricsWithGemini(prompt, mood, genre) };
+          break;
+        case "grok":
+          result = { lyrics: await generateLyricsWithGrok(prompt, mood, genre) };
+          break;
+        default:
+          result = await generateLyrics(prompt, genre, mood);
+      }
       
       // Save generation if user is provided
       if (userId) {
@@ -158,12 +225,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         genre: z.string().min(1),
         bpm: z.number().min(60).max(200),
         duration: z.number().min(1).max(300),
-        userId: z.string().optional()
+        userId: z.string().optional(),
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
       });
 
-      const { genre, bpm, duration, userId } = schema.parse(req.body);
+      const { genre, bpm, duration, userId, aiProvider } = schema.parse(req.body);
       
-      const result = await generateBeatPattern(genre, bpm, duration);
+      let result: any;
+      switch (aiProvider) {
+        case "gemini":
+          result = await generateBeatWithGemini(genre, bpm);
+          break;
+        case "grok":
+          result = await generateBeatWithGrok(genre, bpm);
+          break;
+        default:
+          result = await generateBeatPattern(genre, bpm, duration);
+      }
       
       // Save generation if user is provided
       if (userId) {
@@ -191,12 +269,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const schema = z.object({
         code: z.string().min(1),
         language: z.string().min(1),
-        userId: z.string().optional()
+        userId: z.string().optional(),
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
       });
 
-      const { code, language, userId } = schema.parse(req.body);
+      const { code, language, userId, aiProvider } = schema.parse(req.body);
       
-      const result = await codeToMusic(code, language);
+      let result: any;
+      switch (aiProvider) {
+        case "gemini":
+          result = await convertCodeToMusicWithGemini(code, language);
+          break;
+        case "grok":
+          result = await convertCodeToMusicWithGrok(code, language);
+          break;
+        default:
+          result = await codeToMusic(code, language);
+      }
       
       // Save generation if user is provided
       if (userId) {
@@ -223,11 +312,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const schema = z.object({
         question: z.string().min(1),
-        context: z.string().optional()
+        context: z.string().optional(),
+        aiProvider: z.enum(["openai", "gemini", "grok"]).default("openai")
       });
 
-      const { question, context } = schema.parse(req.body);
-      const result = await getAIAssistance(question, context);
+      const { question, context, aiProvider } = schema.parse(req.body);
+      
+      let result: any;
+      switch (aiProvider) {
+        case "gemini":
+          result = { answer: await getAIAssistanceWithGemini(question, context) };
+          break;
+        case "grok":
+          result = { answer: await getAIAssistanceWithGrok(question, context) };
+          break;
+        default:
+          result = await getAIAssistance(question, context);
+      }
       
       res.json(result);
     } catch (error) {

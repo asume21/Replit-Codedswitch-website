@@ -5,6 +5,7 @@ export interface CodeTranslationRequest {
   sourceLanguage: string;
   targetLanguage: string;
   userId?: string;
+  aiProvider?: "openai" | "gemini" | "grok";
 }
 
 export interface CodeTranslationResponse {
@@ -18,6 +19,7 @@ export interface LyricsRequest {
   genre?: string;
   mood?: string;
   userId?: string;
+  aiProvider?: "openai" | "gemini" | "grok";
 }
 
 export interface LyricsResponse {
@@ -43,6 +45,7 @@ export interface BeatRequest {
   bpm: number;
   duration: number;
   userId?: string;
+  aiProvider?: "openai" | "gemini" | "grok";
 }
 
 export interface BeatResponse {
@@ -56,6 +59,7 @@ export interface CodeBeatRequest {
   code: string;
   language: string;
   userId?: string;
+  aiProvider?: "openai" | "gemini" | "grok";
 }
 
 export interface CodeBeatResponse {
@@ -70,6 +74,7 @@ export interface CodeBeatResponse {
 export interface AIAssistRequest {
   question: string;
   context?: string;
+  aiProvider?: "openai" | "gemini" | "grok";
 }
 
 export interface AIAssistResponse {

@@ -9,6 +9,7 @@ import { ArrowRight, Code, Copy, Download, Share, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { codeAPI } from "@/lib/api";
 import { CodeEditor } from "@/components/ui/code-editor";
+import { AIProviderSelector } from "@/components/ui/ai-provider-selector";
 
 const PROGRAMMING_LANGUAGES = [
   "JavaScript", "TypeScript", "Python", "Java", "C#", "C++", "Go", "Rust", 
@@ -21,6 +22,7 @@ export default function CodeTranslator() {
   const [targetLanguage, setTargetLanguage] = useState("");
   const [translatedCode, setTranslatedCode] = useState("");
   const [explanation, setExplanation] = useState("");
+  const [aiProvider, setAiProvider] = useState("openai");
   const { toast } = useToast();
 
   const translateMutation = useMutation({
@@ -74,6 +76,7 @@ export default function CodeTranslator() {
       sourceCode,
       sourceLanguage,
       targetLanguage,
+      aiProvider
     });
   };
 
@@ -133,12 +136,20 @@ export default function CodeTranslator() {
             </div>
           </div>
 
-          {/* Language Selection */}
+          {/* AI Provider and Language Selection */}
           <Card className="bg-github-secondary border-github-border mb-6">
             <CardHeader>
-              <CardTitle>Select Languages</CardTitle>
+              <CardTitle>Configuration</CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="mb-4">
+                <label className="text-sm font-medium mb-2 block">AI Provider</label>
+                <AIProviderSelector 
+                  value={aiProvider} 
+                  onValueChange={setAiProvider}
+                  className="mb-4"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Source Language</label>
