@@ -21,6 +21,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { aiAPI } from "@/lib/api";
+import { AIProviderSelector } from "@/components/ui/ai-provider-selector";
+
+type AIProvider = "gemini" | "grok";
 
 interface Message {
   id: string;
@@ -57,7 +60,10 @@ const EXAMPLE_CONVERSATIONS = [
   }
 ];
 
+type AIProvider = "gemini" | "grok";
+
 export default function AIAssistant() {
+  const [aiProvider, setAiProvider] = useState<AIProvider>("grok");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -78,7 +84,8 @@ export default function AIAssistant() {
   const { toast } = useToast();
 
   const assistMutation = useMutation({
-    mutationFn: aiAPI.assist,
+    mutationFn: (data: { question: string; context?: string; aiProvider: AIProvider }) => 
+      aiAPI.assist({ ...data }),
     onSuccess: (data) => {
       const assistantMessage: Message = {
         id: Date.now().toString(),
@@ -113,7 +120,8 @@ export default function AIAssistant() {
     
     assistMutation.mutate({
       question: inputValue,
-      context: context || undefined
+      context: context || undefined,
+      aiProvider
     });
 
     setInputValue("");
@@ -164,11 +172,32 @@ export default function AIAssistant() {
     });
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+  };
+
   return (
     <div className="min-h-screen bg-github-dark text-github-text pt-16">
       <div className="flex">
         <div className="flex-1 ml-64 p-8">
           {/* Header */}
+          <CardHeader className="border-b">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl">AI Assistant</CardTitle>
+              <div className="flex items-center space-x-2">
+                <div className="w-48">
+                  <AIProviderSelector 
+                    value={aiProvider}
+                    onValueChange={(value) => setAiProvider(value as AIProvider)}
+                  />
+                </div>
+                <Button variant="outline" size="sm" onClick={handleNewChat}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  New Chat
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
           <div className="mb-8">
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-accent-purple to-accent-cyan rounded-lg flex items-center justify-center mr-4">

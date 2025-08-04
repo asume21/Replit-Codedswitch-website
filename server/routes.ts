@@ -96,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sourceLanguage: z.string().min(1),
         targetLanguage: z.string().min(1),
         userId: z.string().optional(),
-        aiProvider: z.enum(["openai", "gemini", "grok"]).default("grok")
+        aiProvider: z.enum(["gemini", "grok"]).default("grok")
       });
 
       const { sourceCode, sourceLanguage, targetLanguage, userId, aiProvider } = schema.parse(req.body);
@@ -271,22 +271,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const schema = z.object({
         question: z.string().min(1),
         context: z.string().optional(),
-        aiProvider: z.enum(["openai", "gemini", "grok"]).default("grok")
+        aiProvider: z.enum(["gemini", "grok"]).default("grok")
       });
 
       const { question, context, aiProvider } = schema.parse(req.body);
       
-      let result: any;
-      switch (aiProvider) {
-        case "gemini":
-          result = { answer: await getAIAssistanceWithGemini(question, context) };
-          break;
-        case "grok":
-          result = { answer: await getAIAssistanceWithGrok(question, context) };
-          break;
-        default:
-          result = await getAIAssistance(question, context);
-      }
+      // Use Gemini if specified, otherwise default to Grok
+      const result = {
+        answer: aiProvider === "gemini"
+          ? await getAIAssistanceWithGemini(question, context)
+          : await getAIAssistanceWithGrok(question, context)
+      };
       
       res.json(result);
     } catch (error) {
