@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+
+# Project specific
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Batch files and patches
+*.bat
+*.patch
+
+# Sensitive files
+grok_fixes.patch
+start-server.bat
+test-grok.bat
