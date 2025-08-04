@@ -5,7 +5,8 @@ import { resolve } from 'path';
 import type { ServerOptions as HttpProxyOptions } from 'http-proxy';
 import type { InlineConfig } from 'vite';
 import type { RollupOptions, OutputOptions } from 'rollup';
-
+import autoprefixer from 'autoprefixer';
+import postcssPresetEnv from 'postcss-preset-env';
 // Define a more specific type for the proxy configuration
 interface ProxyConfig extends HttpProxyOptions {
   target: string;
@@ -254,8 +255,8 @@ export default defineConfig(({ mode }: ConfigEnv): ViteUserConfig => {
       },
       postcss: {
         plugins: [
-          require('autoprefixer'),
-          require('postcss-preset-env')({
+          autoprefixer(),
+          postcssPresetEnv({
             stage: 3,
             features: {
               'nesting-rules': true,
