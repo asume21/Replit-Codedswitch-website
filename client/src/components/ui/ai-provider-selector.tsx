@@ -37,8 +37,6 @@ export function AIProviderSelector({ value, onValueChange, className }: AIProvid
 
   const getProviderIcon = (id: string) => {
     switch (id) {
-      case "openai":
-        return <Bot className="h-4 w-4" />;
       case "gemini":
         return <Sparkles className="h-4 w-4" />;
       case "grok":
@@ -50,8 +48,6 @@ export function AIProviderSelector({ value, onValueChange, className }: AIProvid
 
   const getProviderColor = (id: string) => {
     switch (id) {
-      case "openai":
-        return "text-green-400";
       case "gemini":
         return "text-blue-400";
       case "grok":
