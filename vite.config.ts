@@ -1,16 +1,17 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type ConfigEnv } from 'vite';
 import react from '@vitejs/plugin-react';
-import { visualizer } from 'rollup-plugin-visualizer';
+import { visualizer, type PluginVisualizerOptions } from 'rollup-plugin-visualizer';
 import { resolve } from 'path';
 import autoprefixer from 'autoprefixer';
 import postcssPresetEnv from 'postcss-preset-env';
+import type { UserConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   // Load environment variables
   const env = loadEnv(mode, process.cwd(), '');
 
   // Base configuration
-  const config = {
+  const config: UserConfig = {
     root: 'client',
     base: '/',
     publicDir: resolve(__dirname, 'public'),
@@ -43,6 +44,13 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    // Resolve configuration
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'client/src'),
+      },
+    },
+
     // Build configuration
     build: {
       outDir: '../dist/client',
@@ -50,7 +58,7 @@ export default defineConfig(({ mode }) => {
       target: 'es2020',
       cssTarget: 'chrome80',
       sourcemap: mode === 'development',
-      minify: mode === 'production' ? 'esbuild' : false,
+      minify: mode === 'production' ? 'esbuild' as const : false,
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'client/index.html'),
@@ -76,13 +84,16 @@ export default defineConfig(({ mode }) => {
 
   // Add visualizer in development
   if (mode === 'development') {
+    if (!config.plugins) {
+      config.plugins = [];
+    }
     config.plugins.push(
       visualizer({
         open: true,
         filename: 'bundle-analysis.html',
         gzipSize: true,
         brotliSize: true,
-      })
+      } as PluginVisualizerOptions)
     );
   }
 
