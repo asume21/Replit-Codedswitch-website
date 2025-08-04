@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: replit-codedswitch
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Add other required environment variables here
+      # - key: DATABASE_URL
+      #   sync: false
+      # - key: GROK_API_KEY
+      #   sync: false
+      # - key: GEMINI_API_KEY
+      #   sync: false

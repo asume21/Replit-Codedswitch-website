@@ -4,17 +4,39 @@
     "composite": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "outDir": "./dist",
-    "rootDir": ".",
+    "target": "ES2022",
+    "outDir": "./dist/server",
+    "rootDir": "./server",
     "noEmit": false,
     "emitDeclarationOnly": false,
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "strict": true,
+    "sourceMap": true,
+    "types": ["node", "vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["./shared/*"],
+      "@/server/*": ["./server/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./shared/types",
+      "./server/types"
+    ]
   },
-  "include": ["server/**/*.ts"],
-  "exclude": ["node_modules", "**/*.test.ts", "dist"]
+  "include": [
+    "server/**/*.ts",
+    "shared/**/*.ts",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "dist",
+    "**/dist/**"
+  ]
 }
