@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { z } from "zod.js";
+import { z } from "zod";
 // OpenAI provider has been removed
 import {
   translateCodeWithGemini,
@@ -22,7 +22,7 @@ import {
   insertProjectSchema,
   insertCodeTranslationSchema,
   insertMusicGenerationSchema
-} from "@shared/schema.js";
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
