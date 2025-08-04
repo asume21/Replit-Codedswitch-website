@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { z } from "zod";
+import { storage } from "./storage.js";
+import { z } from "zod.js";
 // OpenAI provider has been removed
 import {
   translateCodeWithGemini,
@@ -9,20 +9,20 @@ import {
   generateBeatWithGemini,
   convertCodeToMusicWithGemini,
   getAIAssistanceWithGemini
-} from "./gemini";
+} from "./gemini.js";
 import {
   translateCodeWithGrok,
   generateLyricsWithGrok,
   generateBeatWithGrok,
   convertCodeToMusicWithGrok,
   getAIAssistanceWithGrok
-} from "./grok";
+} from "./grok.js";
 import {
   insertUserSchema,
   insertProjectSchema,
   insertCodeTranslationSchema,
   insertMusicGenerationSchema
-} from "@shared/schema";
+} from "@shared/schema.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
