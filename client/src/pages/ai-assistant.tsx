@@ -60,8 +60,6 @@ const EXAMPLE_CONVERSATIONS = [
   }
 ];
 
-type AIProvider = "gemini" | "grok";
-
 export default function AIAssistant() {
   const [aiProvider, setAiProvider] = useState<AIProvider>("grok");
   const [messages, setMessages] = useState<Message[]>([
