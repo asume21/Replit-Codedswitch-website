@@ -17,18 +17,14 @@ interface OpenAIMinimalClient {
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 // Initialize OpenAI client with environment variable check
-const openAIConfig: { apiKey?: string } = {};
+const openAIConfig: { apiKey: string } = { apiKey: '' };
 
 // Check for API key in environment variables
 if (process.env.OPENAI_API_KEY) {
   openAIConfig.apiKey = process.env.OPENAI_API_KEY;
 } else if (process.env.OPENAI_API_KEY_ENV_VAR) {
   openAIConfig.apiKey = process.env.OPENAI_API_KEY_ENV_VAR;
-} else if (process.env.NODE_ENV === 'production') {
-  // In production, we'll use a dummy key but disable API calls
-  openAIConfig.apiKey = 'dummy-key';
-  console.warn('Warning: Running with a dummy OpenAI API key in production');
-} else {
+} else if (!openAIConfig.apiKey) {
   console.warn('Warning: No OpenAI API key found in environment variables');
 }
 

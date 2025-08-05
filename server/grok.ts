@@ -1,8 +1,9 @@
 import OpenAI from "openai";
 
 // Initialize Grok client with environment variable check
-const grokConfig: { baseURL: string; apiKey?: string } = {
-  baseURL: "https://api.x.ai/v1"
+const grokConfig: { baseURL: string; apiKey: string } = {
+  baseURL: "https://api.x.ai/v1",
+  apiKey: ''
 };
 
 // Check for API key in environment variables
@@ -10,7 +11,7 @@ if (process.env.XAI_API_KEY) {
   grokConfig.apiKey = process.env.XAI_API_KEY;
 } else if (process.env.GROK_API_KEY) {
   grokConfig.apiKey = process.env.GROK_API_KEY;
-} else {
+} else if (!grokConfig.apiKey) {
   console.warn('Warning: No Grok API key found in environment variables (XAI_API_KEY or GROK_API_KEY)');
 }
 
