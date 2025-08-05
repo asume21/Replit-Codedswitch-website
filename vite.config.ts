@@ -20,7 +20,14 @@ export default defineConfig(({ mode }) => {
       react({
         jsxImportSource: '@emotion/react',
         babel: {
-          plugins: ['@emotion/babel-plugin'],
+          plugins: [
+            '@emotion/babel-plugin',
+            ['@babel/plugin-transform-runtime', {
+              regenerator: true,
+            }],
+          ],
+          babelrc: false,
+          configFile: false,
         },
       }),
     ],
@@ -46,9 +53,16 @@ export default defineConfig(({ mode }) => {
 
     // Resolve configuration
     resolve: {
-      alias: {
-        '@': resolve(__dirname, 'client/src'),
-      },
+      alias: [
+        {
+          find: '@',
+          replacement: resolve(__dirname, 'client/src'),
+        },
+        {
+          find: '@shared',
+          replacement: resolve(__dirname, 'shared'),
+        },
+      ],
     },
 
     // Build configuration
